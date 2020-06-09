@@ -379,10 +379,7 @@ async function DoWorkAsync(Item1,Item2,Item3,Region,Map,RowNumber) {
     RowCalc.push = calProfit(RowCalc)
 
     ToPrint = [Item1Test,Item2Test,Item3Test,RowCalc.push.profit,Region,Map]
-    var PrintArray = PrintArray.join(ToPrint)
-    console.log('ToPrint is ',ToPrint)
-    console.log('PrintArray is ',PrintArray)
 
     printToDom(RowNumber+'..', 'processing')
-    tableFromJson(PrintArray)
+    tableFromJson(ToPrint)
 }

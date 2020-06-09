@@ -240,7 +240,7 @@ function tableFromJson(data) {
     }
 
     // add json data to the table as rows.
-    tr = table.insertRow(-1);
+//    tr = table.insertRow(-1);
 	
         var tabItemZeroName = tr.insertCell(-1);
         tabItemZeroName.innerHTML = data[0].name
@@ -276,10 +276,31 @@ function tableFromJson(data) {
         var tabMap = tr.insertCell(-1);
         tabMap.innerHTML = data[5]
 
+    tr = table.insertRow(
+        tr.appendChild(tabItemZeroName.innerHTML),
+        tr.appendChild(tabItemZeroAmount.innerHTML),
+        tr.appendChild(tabItemZeroWiki.innerHTML),
+        tr.appendChild(tabItemZeroTrade.innerHTML),
+        
+        tr.appendChild(tabItemOneName.innerHTML),
+        tr.appendChild(tabItemOneAmount.innerHTML),
+        tr.appendChild(tabItemOneWiki.innerHTML),
+        tr.appendChild(tabItemOneTrade.innerHTML),
+        
+        tr.appendChild(tabItemTwoName.innerHTML),
+        tr.appendChild(tabItemTwoAmount.innerHTML),
+        tr.appendChild(tabItemTwoWiki.innerHTML),
+        tr.appendChild(tabItemTwoTrade.innerHTML),
+        
+        tr.appendChild(tabProfit.innerHTML),
+        tr.appendChild(tabRegion.innerHTML),
+        tr.appendChild(tabMap.innerHTML)
+    )
+
     // Now, add the newly created table with json data, to a container.
-    var divShowData = document.getElementById('showData');
-    divShowData.innerHTML = "";
-    divShowData.appendChild(table);
+//    var divShowData = document.getElementById('showData');
+//    divShowData.innerHTML = "";
+//    divShowData.appendChild(table);
     
 }
 

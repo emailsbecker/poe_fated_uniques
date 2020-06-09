@@ -47,7 +47,7 @@ function parseURL(url) {
 /**
  * 
  */
-function doWork(baseUrl, league, itemName) {
+function PollTradeSite(baseUrl, league, itemName) {
     return new Promise(resolve => 
         setTimeout(async function () {
             returnData = {}
@@ -206,7 +206,7 @@ async function extractDesiredItemData_v2(data) {
     return returnData;
 }
 
-function tableFromJson(data) {
+function tableRowFromJson(data) {
     // https://www.encodedna.com/javascript/populate-json-data-to-html-table-using-javascript.htm
         var col = [];
 
@@ -225,9 +225,6 @@ function tableFromJson(data) {
             col.push(i);
         }
     }
-
-    // Create a table.
-    var table = document.createElement("table");
 
     // Create table header row using the extracted headers above.
     var tr = table.insertRow(-1);                   // table row.
@@ -374,27 +371,31 @@ var RowNumber = 0
 /**
  * page has loaded and is ready
  */
-window.onload = function () {
+window.onload = async function () {
     league = getLeague()
     timer = 0;
     
+    // Create a table.
+    var table = document.createElement("table");
+
     // loop each row
-    CompleteTable.forEach(function (RowArray, RowNumber) {
+    const trs = CompleteTable.reduce(function (RowArray, RowNumber) {
         outputData[RowNumber] = []
         Item1 = RowArray[0]
         Item2 = RowArray[1]
         Item3 = RowArray[2]
         Region = RowArray[3]
         Map = RowArray[4]
-        DoWorkAsync(Item1,Item2,Item3,Region,Map,RowNumber)
+        WorkResult = GatherInfoAsync(Item1,Item2,Item3,Region,Map,RowNumber)
+        return WorkResult
 
     })
 };
 
-async function DoWorkAsync(Item1,Item2,Item3,Region,Map,RowNumber) {
-    Item1Test = await doWork(baseUrl, league, Item1).then((data) => {return currencyConverter(data)})
-    Item2Test = await doWork(baseUrl, league, Item2).then((data) => {return currencyConverter(data)})
-    Item3Test = await doWork(baseUrl, league, Item3).then((data) => {return currencyConverter(data)})
+async function GatherInfoAsync(Item1,Item2,Item3,Region,Map,RowNumber) {
+    Item1Test = await PollTradeSite(baseUrl, league, Item1).then((data) => {return currencyConverter(data)})
+    Item2Test = await PollTradeSite(baseUrl, league, Item2).then((data) => {return currencyConverter(data)})
+    Item3Test = await PollTradeSite(baseUrl, league, Item3).then((data) => {return currencyConverter(data)})
 
     RowCalc = [Item1Test,Item2Test,Item3Test] 
     RowCalc.push = calProfit(RowCalc)

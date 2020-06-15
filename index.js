@@ -47,8 +47,8 @@ function parseURL(url) {
 /**
  * 
  */
-function doWork(baseUrl, league, itemName) {
-    return new Promise(resolve => 
+function PollTradeSite(baseUrl, league, itemName) {
+    return new Promise(resolve =>
         setTimeout(async function () {
             returnData = {}
             url = baseUrl + 'search/' + league;
@@ -110,10 +110,9 @@ function currencyConverter(data) {
  * @param {*} rowData array
  */
 function calProfit(rowData) {
-    returnData = {'profit': 0}
-
+    returnData = { 'profit': 0 }
     if (rowData[2].amount > 0 && rowData[1].amount > 0 && rowData[0].amount > 0) {
-        returnData = {'profit': Math.round(rowData[2].amount - rowData[1].amount - rowData[0].amount)}
+        returnData = { 'profit': Math.round(rowData[2].amount - rowData[1].amount - rowData[0].amount) }
     }
 
     return returnData;
@@ -143,13 +142,13 @@ async function searchItem(url, body) {
         body: body,
         headers: { 'Content-Type': 'application/json' },
     })
-    .then((response) => response.json())
-    .then((data) => {
-        return data;
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+        .then((response) => response.json())
+        .then((data) => {
+            return data;
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
 }
 
 /**
@@ -164,13 +163,13 @@ async function getItemMarketData(baseUrl, item_id, item_instance_id) {
     return fetch(baseUrl + 'fetch/' + item_instance_id + '?query=' + item_id, {
         method: 'get'
     })
-    .then((response) => response.json())
-    .then((data) => {
-        return data;
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+        .then((response) => response.json())
+        .then((data) => {
+            return data;
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
 }
 
 /**
@@ -190,12 +189,12 @@ async function extractDesiredItemData(data) {
  * @param {*} data JSON
  */
 async function extractDesiredItemData_v2(data) {
-    
+
     returnData = {};
     if (data.result[0].listing.price) {
-        returnData.amount   = data.result[0].listing.price.amount
+        returnData.amount = data.result[0].listing.price.amount
         returnData.currency = data.result[0].listing.price.currency
-        returnData.id       = data.result[0].item.id
+        returnData.id = data.result[0].item.id
     } else {
         returnData = {
             "amount": 0,
@@ -203,32 +202,132 @@ async function extractDesiredItemData_v2(data) {
             "id": "NA"
         }
     }
-    
+
     return returnData;
 }
 
-function tableFromJson(data) {
+function tableRowFromJson(data) {
     // https://www.encodedna.com/javascript/populate-json-data-to-html-table-using-javascript.htm
-        var col = [];
 
-    // Extract value from table header. 
-    // ('Book ID', 'Book Name', 'Category' and 'Price')
+    // u/CoqeCase: This is your return element
+    var tr = document.createElement('tr');                // table row.
 
-    var myCol = [
-        'Item 1', 'Amount', 'Wiki', 'Trade',
-        'Item 2', 'Amount', 'Wiki', 'Trade',
-        'Item 3', 'Amount', 'Wiki', 'Trade',
-        'Profit', 'Region', 'Map'
-    ]
+    var tabItemZeroName = tr.insertCell(-1);
+    tabItemZeroName.innerHTML = "<a href=\"" + data[0].wiki_url + "\">" + data[0].name + "</a>";
+    var tabItemZeroAmount = tr.insertCell(-1);
+    tabItemZeroAmount.innerHTML = data[0].amount
+    var tabItemZeroTrade = tr.insertCell(-1);
+    tabItemZeroTrade.innerHTML = "<a href=\"" + data[0].trade_url + "\">Trade</a>";
 
-    for (var i = 0; i < myCol.length; i++) {
-        if (col.indexOf(i) === -1) {
-            col.push(i);
-        }
-    }
+    var tabItemTwoName = tr.insertCell(-1);
+    tabItemTwoName.innerHTML = "<a href=\"" + data[1].wiki_url + "\">" + data[1].name + "</a>";
+    var tabItemOneAmount = tr.insertCell(-1);
+    tabItemOneAmount.innerHTML = data[1].amount
+    var tabItemOneTrade = tr.insertCell(-1);
+    tabItemOneTrade.innerHTML = "<a href=\"" + data[1].trade_url + "\">Trade</a>";
 
+    var tabItemTwoName = tr.insertCell(-1);
+    tabItemTwoName.innerHTML = "<a href=\"" + data[2].wiki_url + "\">" + data[2].name + "</a>";
+    var tabItemTwoAmount = tr.insertCell(-1);
+    tabItemTwoAmount.innerHTML = data[2].amount
+    var tabItemTwoTrade = tr.insertCell(-1);
+    tabItemTwoTrade.innerHTML = "<a href=\"" + data[2].trade_url + "\">Trade</a>";
+
+    var tabProfit = tr.insertCell(-1);
+    tabProfit.innerHTML = data[3];
+    var tabRegion = tr.insertCell(-1);
+    tabRegion.innerHTML = data[4];
+    var tabMap = tr.insertCell(-1);
+    tabMap.innerHTML = data[5];
+
+    return tr;
+}
+
+// vars
+
+var baseUrl = "https://www.pathofexile.com/api/trade/"
+var CompleteTable = [
+    ["Fire and Ice", "Hrimsorrow", "Hrimburn", "Act 1", "Boss @ Tidal Island"],
+    ["The Snuffed Flame", "Kaltenhalt", "Kaltensoul", "Act 1", "Lower Prison"],
+    ["Heavy Blows", "Craghead", "Cragfall", "Act 2", "The Old Fields"],
+    ["Ancient Doom","Doomfletch","Doomfletch's Prism","Act 2","Boss @ Ancient Pyramid"],
+    ["Winter's Mournful Melodies","Hrimnor's Hymn","Hrimnor's Dirge","Act 2","The Fellshrine Ruins"],
+    ["The Beginning and the End","Realmshaper","Realm Ender","Act 2","The Crypt Level 2"],
+    ["The Silverwood","Silverbranch","Silverbough","Act 2","Riverways"],
+    ["Nature's Resilience","Springleaf","The Oak","Act 2","Southern Forest"],
+    ["The Servant's Heart","Storm Cloud","The Tempest","Act 2","Boss @ Chamber of Sins"],
+    ["Dying Cry","Deidbell","Deidbellow","Act 3","Boss @ The Ebony Barracks"],
+    ["Trapped in the Tower","Fencoil","Mirebough","Act 3","The Sceptre of God"],
+    ["Fire and Brimstone","Blackgleam","The Signal Fire","Act 3","The Crematorium"],
+    ["Power Magnified","Reverberation Rod","Amplification Rod","Act 3","Piety @ The Lunaris Temple Level 2"],
+    ["End of the Light","Icetomb","Crystal Vault","Act 4","Boss @ The Brine King's Reef"],
+    ["The Bowstring's Music","Death's Harp","Death's Opus","Act 4","Dried Lake"],
+    ["Agony at Dusk","Dusktoe","Duskblight","Act 4","Maligaro @ The Harvest"],
+    ["The King's Path","Kaom's Sign","Kaom's Way","Act 4","Boss @ Kaom's Stronghold"],
+    ["A Forest of False Idols","Araku Tiki","Ngamahu Tiki","Act 4","Kaom's Dream"],
+    ["The Misunderstood Queen","Queen's Decree","Queen's Escape","Act 4","The Belly of the Beast"],
+    ["The Flow of Energy","Shavronne's Pace","Shavronne's Gambit","Act 4","Shavronne @ The Harvest"],
+    ["Severed Limbs","Limbsplit","The Cauteriser","Act 4","The Mines Level 2"],
+    ["The Apex Predator","The Screaming Eagle","The Gryphon","Act 4","Boss @ Aqueduct"],
+    ["Mouth of Horrors","Chalice of Horrors","Thirst for Horrors","Act 4","Doedre @ The Harvest"],
+    ["The King and the Brambles","Bramblejack","Wall of Brambles","Act 4","Daresso @ Grand Arena"],
+    ["A Dishonourable Death","Hyrri's Bite","Hyrri's Demise","Act 6","The Mud Flats"],
+    ["Dark Instincts","Foxshade","Fox's Fortune","Act 7","The Temple of Decay Level 2"],
+    ["The Bloody Flowers Redux","Ezomyte Peak","Ezomyte Hold","Act 8","Boss @ The Grain Gate"],
+    ["The Karui Rebellion","Karui Ward","Karui Charge","Act 8","Boss @ The Grain Gate"],
+    ["Sun's Punishment","Sundance","Sunspite","Act 8","Boss @ The Solaris Temple Level 2"],
+    ["The Great Mind of the North","The Magnate","The Tactician","Act 8","The Bath House"],
+    ["Song of the Sekhema","Asenath's Mark","Asenath's Chant","Act 9","Boss @ The Quarry"],
+    ["The Great Leader of the North","The Magnate","The Nomad","Act 9","The Foothills"],
+    ["Cold Blooded Fury","Bloodboil","Winterweave","T01","Beach Map"],
+    ["A Rift in Time","Blackheart","Voidheart","T02","Laboratory Map"],
+    ["Faith Exhumed","Chober Chaber","Chaber Cairn","T02","Mausoleum Map"],
+    ["The Bishop's Legacy","Geofri's Crest","Geofri's Legacy","T02","Cursed Crypt Map"],
+    ["Blind Faith","The Ignomon","The Effigon","T02","Haunted Mansion"],
+    ["A Rift in Time","Timeclasp","Timetwist","T02","Laboratory Map"],
+    ["Last of the Wildmen","Briskwrap","Wildwrap","T02","Strand"],
+    ["Cold Greed","Cameria's Maul","Cameria's Avarice","T03","Waterways"],
+    ["Blinding Light","Eclipse Solaris","Corona Solaris","T03","Temple Map"],
+    ["The Dreaded Rhoa","Redbeak","Dreadbeak","T03","Bog Map"],
+    ["Black Devotion","Geofri's Baptism","Geofri's Devotion","T03","Relic Chambers Map"],
+    ["Greed's Folly","Wondertrap","Greedtrap","T03","Vault Map"],
+    ["Crimson Hues","Goredrill","Sanguine Gambol","T03","Overgrown Ruin Map"],
+    ["Dance of Steel","The Dancing Dervish","The Dancing Duo","T03","Arsenal"],
+    ["The Malevolent Witch","Doedre's Tenure","Doedre's Malevolence","T04","Phantasmagoria Map"],
+    ["A Vision of Ice and Fire","Heatshiver","Frostferno","T04","Estuary Map"],
+    ["Battle Hardened","Iron Heart","The Iron Fortress","T04","Colonnade"],
+    ["The Mentor","Matua Tupuna","Whakatutuki o Matua","T05","Basilica Map"],
+    ["The Fall of an Empire","Quecholli","Panquetzaliztli","T09","Maze Map"],
+    ["The Nightmare Awakens","Malachai's Simula","Malachai's Awakening","T11","Core"],
+    ["Darktongue's Shriek","Windscream","Windshriek","T11","Sepulchre Map"],
+    ["Pleasure and Pain","Crown of Thorns","Martyr's Crown","T12","Core Map"],
+    ["The Storm Spire","The Stormheart","The Stormwall","T13","Plateau Map"],
+    ["Burning Dread","Dreadarc","Dreadsurge","T14","Shrine Map"],
+    ["The Queen's Sacrifice","Atziri's Mirror","Atziri's Reflection","Uber","The Alluring Abyss"],
+]
+var outputData = []
+var RowNumber = 0
+var DisplayCounter = 1
+
+// core logic
+
+/**
+ * page has loaded and is ready
+ */
+window.onload = function () {
+    league = getLeague()
+    timer = 0;
+
+    const cont = document.querySelector('#showData')
     // Create a table.
     var table = document.createElement("table");
+
+    var myCol = [
+        'Prophecy', 'Amount', 'Trade',
+        'Ingredient', 'Amount', 'Trade',
+        'Result', 'Amount', 'Trade',
+        'Profit', 'Region', 'Map'
+    ];
 
     // Create table header row using the extracted headers above.
     var tr = table.insertRow(-1);                   // table row.
@@ -240,148 +339,41 @@ function tableFromJson(data) {
         tr.appendChild(th);
     }
 
-    // add json data to the table as rows.
-    for (var i = 0; i < data.length; i++) {
+    cont.appendChild(table);
 
-        tr = table.insertRow(-1);
-
-        for (var j = 0; j < col.length; j++) {
-            // profit object
-            if (j == 3) {
-                var tabCellProfit = tr.insertCell(-1);
-                tabCellProfit.innerHTML = data[i][3].profit;
-                break;
-            }
-
-            // dont ask me. For whatever reason loop j runs again after the last item and will throw an error w/o an explicity check
-            if (!data[i][col[j]]) {
-                break;
-            }
-
-            var tabCell = tr.insertCell(-1);
-            tabCell.innerHTML = data[i][col[j]].name;
-
-            var tabCellAmount = tr.insertCell(-1);
-            tabCellAmount.innerHTML = data[i][col[j]].amount;
-
-            var tabCellWiki = tr.insertCell(-1);
-            tabCellWiki.innerHTML = "<a href=\""+data[i][col[j]].wiki_url+"\">Wiki</a>";
-
-            var tabCellTrade = tr.insertCell(-1);
-            tabCellTrade.innerHTML = "<a href=\""+data[i][col[j]].trade_url+"\">Trade</a>";
-        }
-    }
-
-    // Now, add the newly created table with json data, to a container.
-    var divShowData = document.getElementById('showData');
-    divShowData.innerHTML = "";
-    divShowData.appendChild(table);
-    
-}
-
-// vars
-
-var baseUrl = "https://www.pathofexile.com/api/trade/"
-var itemsRow = [
-     ["Fire and Ice","Hrimsorrow","Hrimburn","Act 1","Boss @ Tidal Island"],
-     ["The Snuffed Flame","Kaltenhalt","Kaltensoul","Act 1","Lower Prison"],
-     ["Heavy Blows","Craghead","Cragfall","Act 2","The Old Fields"],
-     ["Ancient Doom","Doomfletch","Doomfletch's Prism","Act 2","Boss @ Ancient Pyramid"],
-     ["Winter's Mournful Melodies","Hrimnor's Hymn","Hrimnor's Dirge","Act 2","The Fellshrine Ruins"],
-     ["The Beginning and the End","Realmshaper","Realm Ender","Act 2","The Crypt Level 2"],
-     ["The Silverwood","Silverbranch","Silverbough","Act 2","Riverways"],
-     ["Nature's Resilience","Springleaf","The Oak","Act 2","Southern Forest"],
-     ["The Servant's Heart","Storm Cloud","The Tempest","Act 2","Boss @ Chamber of Sins"],
-     ["Dying Cry","Deidbell","Deidbellow","Act 3","Boss @ The Ebony Barracks"],
-     ["Trapped in the Tower","Fencoil","Mirebough","Act 3","The Sceptre of God"],
-     ["Fire and Brimstone","Blackgleam","The Signal Fire","Act 3","The Crematorium"],
-     ["Power Magnified","Reverberation Rod","Amplification Rod","Act 3","Piety @ The Lunaris Temple Level 2"],
-     ["End of the Light","Icetomb","Crystal Vault","Act 4","Boss @ The Brine King's Reef"],
-     ["The Bowstring's Music","Death's Harp","Death's Opus","Act 4","Dried Lake"],
-     ["Agony at Dusk","Dusktoe","Duskblight","Act 4","Maligaro @ The Harvest"],
-     ["The King's Path","Kaom's Sign","Kaom's Way","Act 4","Boss @ Kaom's Stronghold"],
-     ["A Forest of False Idols","Araku Tiki","Ngamahu Tiki","Act 4","Kaom's Dream"],
-     ["The Misunderstood Queen","Queen's Decree","Queen's Escape","Act 4","The Belly of the Beast"],
-     ["The Flow of Energy","Shavronne's Pace","Shavronne's Gambit","Act 4","Shavronne @ The Harvest"],
-     ["Severed Limbs","Limbsplit","The Cauteriser","Act 4","The Mines Level 2"],
-     ["The Apex Predator","The Screaming Eagle","The Gryphon","Act 4","Boss @ Aqueduct"],
-     ["Mouth of Horrors","Chalice of Horrors","Thirst for Horrors","Act 4","Doedre @ The Harvest"],
-     ["The King and the Brambles","Bramblejack","Wall of Brambles","Act 4","Daresso @ Grand Arena"],
-     ["A Dishonourable Death","Hyrri's Bite","Hyrri's Demise","Act 6","The Mud Flats"],
-     ["Dark Instincts","Foxshade","Fox's Fortune","Act 7","The Temple of Decay Level 2"],
-     ["The Bloody Flowers Redux","Ezomyte Peak","Ezomyte Hold","Act 8","Boss @ The Grain Gate"],
-     ["The Karui Rebellion","Karui Ward","Karui Charge","Act 8","Boss @ The Grain Gate"],
-     ["Sun's Punishment","Sundance","Sunspite","Act 8","Boss @ The Solaris Temple Level 2"],
-     ["The Great Mind of the North","The Magnate","The Tactician","Act 8","The Bath House"],
-     ["Song of the Sekhema","Asenath's Mark","Asenath's Chant","Act 9","Boss @ The Quarry"],
-     ["The Great Leader of the North","The Magnate","The Nomad","Act 9","The Foothills"],
-     ["Cold Blooded Fury","Bloodboil","Winterweave","T01","Beach Map"],
-     ["A Rift in Time","Blackheart","Voidheart","T02","Laboratory Map"],
-     ["Faith Exhumed","Chober Chaber","Chaber Cairn","T02","Mausoleum Map"],
-     ["The Bishop's Legacy","Geofri's Crest","Geofri's Legacy","T02","Cursed Crypt Map"],
-     ["Blind Faith","The Ignomon","The Effigon","T02","Haunted Mansion"],
-     ["A Rift in Time","Timeclasp","Timetwist","T02","Laboratory Map"],
-     ["Last of the Wildmen","Briskwrap","Wildwrap","T02","Strand"],
-     ["Cold Greed","Cameria's Maul","Cameria's Avarice","T03","Waterways"],
-     ["Blinding Light","Eclipse Solaris","Corona Solaris","T03","Temple Map"],
-     ["The Dreaded Rhoa","Redbeak","Dreadbeak","T03","Bog Map"],
-     ["Black Devotion","Geofri's Baptism","Geofri's Devotion","T03","Relic Chambers Map"],
-     ["Greed's Folly","Wondertrap","Greedtrap","T03","Vault Map"],
-     ["Crimson Hues","Goredrill","Sanguine Gambol","T03","Overgrown Ruin Map"],
-     ["Dance of Steel","The Dancing Dervish","The Dancing Duo","T03","Arsenal"],
-     ["The Malevolent Witch","Doedre's Tenure","Doedre's Malevolence","T04","Phantasmagoria Map"],
-     ["A Vision of Ice and Fire","Heatshiver","Frostferno","T04","Estuary Map"],
-     ["Battle Hardened","Iron Heart","The Iron Fortress","T04","Colonnade"],
-     ["The Mentor","Matua Tupuna","Whakatutuki o Matua","T05","Basilica Map"],
-     ["The Fall of an Empire","Quecholli","Panquetzaliztli","T09","Maze Map"],
-     ["The Nightmare Awakens","Malachai's Simula","Malachai's Awakening","T11","Core"],
-     ["Darktongue's Shriek","Windscream","Windshriek","T11","Sepulchre Map"],
-     ["Pleasure and Pain","Crown of Thorns","Martyr's Crown","T12","Core Map"],
-     ["The Storm Spire","The Stormheart","The Stormwall","T13","Plateau Map"],
-     ["Burning Dread","Dreadarc","Dreadsurge","T14","Shrine Map"],
-     ["The Queen's Sacrifice","Atziri's Mirror","Atziri's Reflection","Uber","The Alluring Abyss"],
-]
-var outputData = []
-
-// core logic
-
-/**
- * page has loaded and is ready
- */
-window.onload = function () {
-    league = getLeague()
-    timer = 0;
-    itemsRowCount = itemsRow.length - 1
-    
     // loop each row
-    itemsRow.forEach(function (row, i) {
-        
-        outputData[i] = []
+    CompleteTable.forEach(async function (RowArray, RowNumber) {
+        const outputData = [];
+        outputData[RowNumber] = [];
+        const Item1 = RowArray[0];
+        const Item2 = RowArray[1];
+        const Item3 = RowArray[2];
+        const Region = RowArray[3];
+        const Map = RowArray[4];
 
-        // loop each item per row
-        row.forEach(async function (itemName, ii) {
-            outputData[i][ii] = await doWork(baseUrl, league, itemName)
-            .then((data) => {
-                return currencyConverter(data)
-            });
+        const tr = await GatherInfoAsync(Item1, Item2, Item3, Region, Map, RowNumber);
 
-            if ( ii == 0 ) {
-                printToDom(i + 1, 'processing');
-            } else {
-                printToDom('.', 'processing');
-            }
+        table.appendChild(tr);
+    });
 
-            // print data set to 
-            if ( ii == 2 ) {
-                outputData[i].push(
-                    calProfit(outputData[i])
-                )
-            }
-
-            if ( ii == 2 ) {
-                // printToDom(JSON.stringify(outputData), 'data');
-                tableFromJson(outputData)
-            }
-        })
-    })
 };
+
+async function GatherInfoAsync(Item1, Item2, Item3, Region, Map, RowNumber) {
+    const Item1Test = await PollTradeSite(baseUrl, league, Item1).then((data) => { return currencyConverter(data) })
+    printToDom(RowNumber + "..", 'prophecies')
+
+    const Item2Test = await PollTradeSite(baseUrl, league, Item2).then((data) => { return currencyConverter(data) })
+    printToDom(RowNumber + "..", 'sacrifices')
+
+    const Item3Test = await PollTradeSite(baseUrl, league, Item3).then((data) => { return currencyConverter(data) })
+    printToDom(RowNumber + "..", 'results')
+
+    const RowCalc = [Item1Test, Item2Test, Item3Test]
+    RowCalc.push = calProfit(RowCalc)
+
+    const ToPrint = [Item1Test, Item2Test, Item3Test, RowCalc.push.profit, Region, Map]
+    DisplayCounter++
+
+    // u/CoqeCase: tableRowFromJson returns a <tr>, and then we return that back to the forEach in onload.
+    return tableRowFromJson(ToPrint);
+}
